@@ -387,19 +387,6 @@ export function Player() {
 
       <div className="flex flex-1 flex-col items-center bg-canvas px-4 pb-16 pt-10 font-sans">
         <main className="flex w-full max-w-3xl flex-col gap-10">
-          <header className="max-w-xl">
-            <p className={eyebrow}>Quran memorization</p>
-            <h1 className="mt-3 font-display text-[2.5rem] leading-[1.1] tracking-tight text-ink sm:text-[3rem]">
-              Hear an ayah.
-              <br />
-              Pause. Recall.
-            </h1>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-muted">
-              Listen, then recite the next from memory. A calm loop for
-              building verse-by-verse recall.
-            </p>
-          </header>
-
           <div className="flex w-full flex-col gap-6">
             <audio
               ref={audioRef}
