@@ -40,10 +40,21 @@ function GearIcon() {
   );
 }
 
+function MarkIcon() {
+  return (
+    <span
+      aria-hidden="true"
+      className="flex h-7 w-7 items-center justify-center rounded-full bg-ink text-[11px] font-semibold tracking-tight text-on-action"
+    >
+      S
+    </span>
+  );
+}
+
 const eyebrow =
   "text-[11px] font-medium uppercase tracking-[0.14em] text-quiet";
 const fieldSelect =
-  "w-full rounded-full border border-line bg-surface px-3.5 py-2 text-sm text-ink transition-colors hover:border-line-strong";
+  "select-pill w-full rounded-full border border-line bg-sunken/60 px-3.5 py-2.5 text-sm text-ink transition-all hover:border-line-strong hover:bg-sunken focus:border-line-strong";
 
 export function Menubar({
   arabicFont,
@@ -78,28 +89,28 @@ export function Menubar({
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-3.5">
-        <Link
-          href="/"
-          className="group flex items-baseline gap-2"
-        >
-          <span className="font-display text-[1.35rem] leading-none tracking-tight text-ink">
-            Subciska
-          </span>
-          <span className="hidden text-[10px] font-medium uppercase tracking-[0.16em] text-quiet sm:inline">
-            Memorize
+    <header className="sticky top-0 z-50 border-b border-line/70 bg-surface/75 backdrop-blur-xl supports-[backdrop-filter]:bg-surface/60">
+      <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-3">
+        <Link href="/" className="group flex items-center gap-2.5">
+          <MarkIcon />
+          <span className="flex flex-col leading-none">
+            <span className="font-display text-[1.2rem] tracking-tight text-ink transition-colors group-hover:text-forest">
+              Subciska
+            </span>
+            <span className="mt-0.5 hidden text-[9px] font-medium uppercase tracking-[0.18em] text-quiet sm:block">
+              Memorize
+            </span>
           </span>
         </Link>
 
-        <div className="relative">
+        <div className="relative" ref={rootRef}>
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
-            className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-[11px] font-medium uppercase tracking-[0.12em] transition-colors ${
+            className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-[11px] font-medium uppercase tracking-[0.12em] transition-all active:scale-[0.98] ${
               open
-                ? "border-ink bg-ink text-on-action"
-                : "border-line bg-surface text-ink hover:border-line-strong hover:bg-sunken"
+                ? "border-ink bg-ink text-on-action shadow-md"
+                : "border-line bg-surface/80 text-ink shadow-xs hover:border-line-strong hover:bg-sunken"
             }`}
             aria-label="App Settings"
             aria-expanded={open}
@@ -113,14 +124,14 @@ export function Menubar({
             <div
               role="dialog"
               aria-label="App Settings"
-              className="absolute right-0 mt-2.5 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-line bg-surface p-5 shadow-[0_12px_40px_rgba(33,33,33,0.08)]"
+              className="animate-pop absolute right-0 mt-3 w-[min(22rem,calc(100vw-2rem))] rounded-3xl border border-line/80 bg-surface p-5 shadow-lg"
             >
-              <div className="mb-4 flex items-center justify-between border-b border-line pb-3">
+              <div className="mb-4 flex items-center justify-between border-b border-line/70 pb-3">
                 <p className={eyebrow}>App Settings</p>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="-mr-1 rounded-full px-2 py-1 text-sm text-muted hover:bg-sunken hover:text-ink"
+                  className="-mr-1 flex h-7 w-7 items-center justify-center rounded-full text-sm text-muted transition-colors hover:bg-sunken hover:text-ink"
                   aria-label="Close settings"
                 >
                   ✕
@@ -163,7 +174,7 @@ export function Menubar({
                   <span
                     dir="rtl"
                     lang="ar"
-                    className="font-arabic rounded-xl bg-sunken px-3.5 py-2.5 text-right text-ink"
+                    className="font-arabic rounded-2xl border border-line/50 bg-sunken px-4 py-3 text-right text-ink"
                     style={{ fontSize: "var(--font-arabic-size)" }}
                   >
                     بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
@@ -203,7 +214,7 @@ export function Menubar({
                     ))}
                   </select>
                   <span
-                    className="font-english rounded-xl bg-sunken px-3.5 py-2.5 text-ink"
+                    className="font-english rounded-2xl border border-line/50 bg-sunken px-4 py-3 text-ink"
                     style={{ fontSize: "var(--font-english-size)" }}
                   >
                     In the name of God, the Most Gracious, the Most Merciful.

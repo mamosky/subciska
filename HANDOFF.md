@@ -105,26 +105,30 @@ Files go in R2 bucket **`subciska-audio`** at key `{surah}_{ayah}.mp3` (e.g. `1_
 - Persisted in localStorage + D1 columns `user_state.arabic_font`, `user_state.english_font` (migration `0003_font_settings.sql`). **Apply migrations with `--command`, not `--file`** — multi-statement file import can hit OAuth `Authentication error [code: 10000]` on this machine.
 - Invalid values coerced with `coerceArabicFont` / `coerceEnglishFont`.
 
-### Design system — Allbirds-inspired (live)
+### Design system — warm modern (live)
 
-Visual language is modeled on allbirds.com: warm oatmeal canvas, quiet chrome, editorial serif for display only, pill CTAs.
+Visual language: warm oatmeal canvas (Allbirds) + contemporary product chrome (frosted header, layered shadows, circular transport, countdown ring).
 
 | Role | Light | Notes |
 |---|---|---|
 | Canvas | `#ece9e2` | page bg — never pure white |
 | Surface | `#ffffff` | header, cards |
-| Sand / sunken | `#e0dacf` / `#f4f2ec` | progress track, verse well |
+| Sand / sunken | `#e0dacf` / `#f4f2ec` | progress track, inputs, verse well |
 | Ink / muted / quiet | `#212121` / `#575757` / `#767676` | text hierarchy |
-| Line / line-strong | `#d6d2c8` / `#b9b4a7` | hairline borders |
-| Action / on-action | `#212121` / `#ffffff` | primary pill CTA |
-| Forest | `#3a6b52` | progress, countdown, focus, link hover |
+| Line / line-strong | `#d6d2c8` / `#b9b4a7` | hairline borders (often at /70 opacity) |
+| Action / on-action | `#212121` / `#ffffff` | primary play button |
+| Forest | `#3a6b52` | progress, countdown ring, focus, pause badge |
 
-- Tokens live as CSS vars in `globals.css` (`:root` + warm dark override) and are exposed via `@theme inline` as Tailwind utilities: `bg-canvas`, `bg-surface`, `bg-sand`, `bg-sunken`, `text-ink`, `text-muted`, `text-quiet`, `border-line`, `bg-action`, `text-on-action`, `bg-forest`, `text-forest`, `font-display`. Prefer these over raw `zinc`/`emerald`.
-- **Typography:** Instrument Serif (`font-display`, `--font-display-serif` in `layout.tsx`) for hero + wordmark only — sparing, like Allbirds' Self Modern. Geist (`font-sans`) as the Geograph stand-in for UI; uppercase tracked eyebrows (`11px` / `0.14em`) for labels.
-- **Shapes:** full pill (`rounded-full`) on buttons, inputs, segmented control; `rounded-2xl` (16px) on cards; hairline borders; soft shadow only on the settings popover.
-- **Controls:** Mode is a **segmented pill** (Test me / Repeat) — selected = ink fill, unselected = muted. Primary Play = solid ink pill, uppercase tracked. Secondary = outline pill.
-- Dark mode still works via `prefers-color-scheme` flipping the same CSS vars (warm charcoal, not pure black).
-- `themeColor` must be exported from `viewport`, not `metadata` (Next 16 warning).
+- Tokens live as CSS vars in `globals.css` (`:root` + warm dark override) + elevation shadows (`--shadow-xs/sm/md/lg`) exposed via `@theme inline`.
+- **Chrome:** sticky frosted header (`bg-surface/75 backdrop-blur-xl`); settings popover `rounded-3xl` + `shadow-lg` + `animate-pop`.
+- **Cards:** `rounded-3xl border-line/70 shadow-sm/md`; verse well is gradient sunken→surface with hairline border.
+- **Transport:** circular prev/next icon buttons + large center play/stop circle (`h-14 w-14`, `active:scale-95`).
+- **Recite phase:** SVG circular countdown ring (forest stroke, 100ms linear updates) with seconds in the center.
+- **Mode control:** sliding pill indicator (`translate-x-full`, 300ms ease) over sunken track.
+- **Controls:** custom range (filled track + forest thumb), `.select-pill` chevron on selects, pause length shown as forest-tint badge.
+- **Motion:** `animate-rise` (page), `animate-pop` (popover), `animate-soft-pulse` (status dot / loading); respect `prefers-reduced-motion`.
+- **Typography:** Instrument Serif for wordmark + recite prompt; Geist UI; uppercase tracked eyebrows.
+- Dark mode flips the same CSS vars (warm charcoal). `themeColor` lives on `viewport`.
 
 ### Lint gotcha
 
@@ -139,8 +143,8 @@ Working in production:
 - `/api/state` GET + PUT round-trip persists to D1 (includes `leadMutes`, `arabicFont`, `englishFont`)
 - Arabic font fully live (200 on woff2/ttf, preload in HTML, KFGQPC in CSS)
 - Lead-mute option live ("Mute first (ayat)")
-- App Settings live (menubar gear → Arabic/English font pickers)
-- Allbirds-style redesign live (oatmeal canvas, serif hero, pill CTAs, forest accent)
+- App Settings live (menubar gear → Arabic/English font + text size pickers)
+- Warm modern redesign live (frosted header, circular transport, countdown ring, sliding mode pill)
 - `lint` / `tsc --noEmit` / `next build` / `opennextjs-cloudflare build` all pass
 
 Not done:
