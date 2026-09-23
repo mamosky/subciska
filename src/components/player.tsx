@@ -268,8 +268,18 @@ export function Player() {
   }, []);
 
   useEffect(() => {
-    applyFontSettings(state.arabicFont, state.englishFont);
-  }, [state.arabicFont, state.englishFont]);
+    applyFontSettings(
+      state.arabicFont,
+      state.englishFont,
+      state.arabicTextSize,
+      state.englishTextSize
+    );
+  }, [
+    state.arabicFont,
+    state.englishFont,
+    state.arabicTextSize,
+    state.englishTextSize,
+  ]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -343,7 +353,8 @@ export function Player() {
           <p
             dir="rtl"
             lang="ar"
-            className="font-arabic text-right text-[1.7rem] leading-[2.35] text-ink"
+            className="font-arabic text-right leading-[2.35] text-ink"
+            style={{ fontSize: "var(--font-arabic-size)" }}
           >
             {verse.arabic}
           </p>
@@ -356,7 +367,10 @@ export function Player() {
             </p>
           </div>
         ) : (
-          <p className="font-english text-base leading-relaxed text-muted">
+          <p
+            className="font-english leading-relaxed text-muted"
+            style={{ fontSize: "var(--font-english-size)" }}
+          >
             {verse.english}
           </p>
         )}
@@ -377,11 +391,19 @@ export function Player() {
       <Menubar
         arabicFont={state.arabicFont}
         englishFont={state.englishFont}
+        arabicTextSize={state.arabicTextSize}
+        englishTextSize={state.englishTextSize}
         onArabicFontChange={(arabicFont) =>
           setStateAndPersist((prev) => ({ ...prev, arabicFont }))
         }
         onEnglishFontChange={(englishFont) =>
           setStateAndPersist((prev) => ({ ...prev, englishFont }))
+        }
+        onArabicTextSizeChange={(arabicTextSize) =>
+          setStateAndPersist((prev) => ({ ...prev, arabicTextSize }))
+        }
+        onEnglishTextSizeChange={(englishTextSize) =>
+          setStateAndPersist((prev) => ({ ...prev, englishTextSize }))
         }
       />
 

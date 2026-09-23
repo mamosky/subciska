@@ -1,7 +1,12 @@
 export type Mode = "test" | "repeat";
 
-import type { ArabicFont, EnglishFont } from "./fonts";
-import { DEFAULT_ARABIC_FONT, DEFAULT_ENGLISH_FONT } from "./fonts";
+import type { ArabicFont, EnglishFont, TextSize } from "./fonts";
+import {
+  DEFAULT_ARABIC_FONT,
+  DEFAULT_ARABIC_SIZE,
+  DEFAULT_ENGLISH_FONT,
+  DEFAULT_ENGLISH_SIZE,
+} from "./fonts";
 
 export type SavedState = {
   surah: number;
@@ -13,6 +18,8 @@ export type SavedState = {
   leadMutes: number;
   arabicFont: ArabicFont;
   englishFont: EnglishFont;
+  arabicTextSize: TextSize;
+  englishTextSize: TextSize;
   step: number;
 };
 
@@ -34,6 +41,8 @@ export const DEFAULT_STATE: SavedState = {
   leadMutes: 0,
   arabicFont: DEFAULT_ARABIC_FONT,
   englishFont: DEFAULT_ENGLISH_FONT,
+  arabicTextSize: DEFAULT_ARABIC_SIZE,
+  englishTextSize: DEFAULT_ENGLISH_SIZE,
   step: 0,
 };
 

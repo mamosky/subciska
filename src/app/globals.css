@@ -20,6 +20,8 @@
   --font-arabic-user: "KFGQPC Hafs Uthmanic Script", "UthmanicHafs",
     "Geeza Pro", "Arabic Typesetting", "Noto Naskh Arabic", serif;
   --font-english-user: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  --font-arabic-size: 1.7rem;
+  --font-english-size: 1rem;
 }
 
 @font-face {

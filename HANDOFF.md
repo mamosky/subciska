@@ -57,14 +57,15 @@ src/
     api/state/route.ts    # GET/PUT user state (D1, prepare-only — see below)
     api/audio/[surah]/[ayah]/route.ts  # streams MP3 from R2 AUDIO_BUCKET
   components/player.tsx   # main UI: Test/Repeat modes, range, pause slider, progress; renders Menubar
-  components/menubar.tsx   # sticky top bar + gear icon; App Settings dropdown (fonts)
+  components/menubar.tsx   # sticky top bar + gear icon; App Settings dropdown (fonts + text sizes)
   lib/player.ts           # DEFAULT_STATE, SavedState type
-  lib/fonts.ts            # Arabic/English font options + applyFontSettings CSS vars
+  lib/fonts.ts            # Arabic/English font + text-size options; applyFontSettings CSS vars
 public/fonts/             # hafs-uthmanic-v14-full.woff2 (.ttf), self-hosted
 scripts/populate-cache.mjs
 migrations/0001_init.sql  # user_state schema (already applied remotely)
 migrations/0002_lead_mutes.sql  # ADD COLUMN lead_mutes INTEGER NOT NULL DEFAULT 0 (applied remotely)
 migrations/0003_font_settings.sql  # ADD COLUMN arabic_font / english_font (applied remotely via --command, not --file)
+migrations/0004_text_sizes.sql  # ADD COLUMN arabic_text_size / english_text_size (applied remotely)
 wrangler.jsonc            # bindings (DB, R2, ASSETS, WORKER_SELF_REFERENCE)
 open-next.config.ts
 subciska spec doc.rtf     # original requirements

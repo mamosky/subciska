@@ -1,6 +1,11 @@
 import type { SavedState } from "./player";
 import { DEFAULT_STATE } from "./player";
-import { coerceArabicFont, coerceEnglishFont } from "./fonts";
+import {
+  coerceArabicFont,
+  coerceArabicTextSize,
+  coerceEnglishFont,
+  coerceEnglishTextSize,
+} from "./fonts";
 
 const KEY = "subciska:state";
 
@@ -22,6 +27,8 @@ export function loadLocalState(): SavedState | null {
         : DEFAULT_STATE.leadMutes,
       arabicFont: coerceArabicFont(parsed.arabicFont),
       englishFont: coerceEnglishFont(parsed.englishFont),
+      arabicTextSize: coerceArabicTextSize(parsed.arabicTextSize),
+      englishTextSize: coerceEnglishTextSize(parsed.englishTextSize),
       step: Number(parsed.step) || 0,
       mode: parsed.mode === "repeat" ? "repeat" : "test",
     };

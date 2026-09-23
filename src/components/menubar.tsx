@@ -5,15 +5,21 @@ import Link from "next/link";
 import {
   ARABIC_FONT_OPTIONS,
   ENGLISH_FONT_OPTIONS,
+  TEXT_SIZE_OPTIONS,
   type ArabicFont,
   type EnglishFont,
+  type TextSize,
 } from "@/lib/fonts";
 
 type MenubarProps = {
   arabicFont: ArabicFont;
   englishFont: EnglishFont;
+  arabicTextSize: TextSize;
+  englishTextSize: TextSize;
   onArabicFontChange: (font: ArabicFont) => void;
   onEnglishFontChange: (font: EnglishFont) => void;
+  onArabicTextSizeChange: (size: TextSize) => void;
+  onEnglishTextSizeChange: (size: TextSize) => void;
 };
 
 function GearIcon() {
@@ -42,8 +48,12 @@ const fieldSelect =
 export function Menubar({
   arabicFont,
   englishFont,
+  arabicTextSize,
+  englishTextSize,
   onArabicFontChange,
   onEnglishFontChange,
+  onArabicTextSizeChange,
+  onEnglishTextSizeChange,
 }: MenubarProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -133,10 +143,28 @@ export function Menubar({
                       </option>
                     ))}
                   </select>
+                </label>
+
+                <label className="flex flex-col gap-2 text-sm">
+                  <span className={eyebrow}>Arabic text size</span>
+                  <select
+                    className={fieldSelect}
+                    value={arabicTextSize}
+                    onChange={(event) =>
+                      onArabicTextSizeChange(event.target.value as TextSize)
+                    }
+                  >
+                    {TEXT_SIZE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                   <span
                     dir="rtl"
                     lang="ar"
-                    className="font-arabic rounded-xl bg-sunken px-3.5 py-2.5 text-right text-lg text-ink"
+                    className="font-arabic rounded-xl bg-sunken px-3.5 py-2.5 text-right text-ink"
+                    style={{ fontSize: "var(--font-arabic-size)" }}
                   >
                     بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                   </span>
@@ -157,7 +185,27 @@ export function Menubar({
                       </option>
                     ))}
                   </select>
-                  <span className="font-english rounded-xl bg-sunken px-3.5 py-2.5 text-base text-ink">
+                </label>
+
+                <label className="flex flex-col gap-2 text-sm">
+                  <span className={eyebrow}>English text size</span>
+                  <select
+                    className={fieldSelect}
+                    value={englishTextSize}
+                    onChange={(event) =>
+                      onEnglishTextSizeChange(event.target.value as TextSize)
+                    }
+                  >
+                    {TEXT_SIZE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <span
+                    className="font-english rounded-xl bg-sunken px-3.5 py-2.5 text-ink"
+                    style={{ fontSize: "var(--font-english-size)" }}
+                  >
                     In the name of God, the Most Gracious, the Most Merciful.
                   </span>
                 </label>
