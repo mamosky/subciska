@@ -1,0 +1,37 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "subciska",
+  "compatibility_date": "2025-09-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "subciska"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "subciska",
+      "database_id": "871ee7d9-e37c-4d50-8d7c-639fe1dd3718"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "subciska-cache"
+    },
+    {
+      "binding": "AUDIO_BUCKET",
+      "bucket_name": "subciska-audio"
+    }
+  ],
+  "images": {
+    "binding": "IMAGES"
+  }
+}

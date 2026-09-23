@@ -5,11 +5,22 @@
   --foreground: #171717;
 }
 
+@font-face {
+  font-family: "KFGQPC Hafs Uthmanic Script";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/hafs-uthmanic-v14-full.woff2") format("woff2"),
+    url("/fonts/hafs-uthmanic-v14-full.ttf") format("truetype");
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-arabic: "KFGQPC Hafs Uthmanic Script", "UthmanicHafs", "Geeza Pro",
+    "Arabic Typesetting", "Noto Naskh Arabic", serif;
 }
 
 @media (prefers-color-scheme: dark) {

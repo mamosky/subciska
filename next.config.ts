@@ -5,3 +5,13 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+if (process.env.NODE_ENV === "development") {
+  void import("@opennextjs/cloudflare")
+    .then(({ initOpenNextCloudflareForDev }) => {
+      initOpenNextCloudflareForDev();
+    })
+    .catch((err) => {
+      console.warn("OpenNext Cloudflare dev init skipped:", err);
+    });
+}

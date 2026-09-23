@@ -1,0 +1,1 @@
+ALTER TABLE user_state ADD COLUMN lead_mutes INTEGER NOT NULL DEFAULT 0;
