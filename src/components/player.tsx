@@ -30,6 +30,13 @@ type VerseEntry =
   | { status: "ok"; data: VerseText }
   | { status: "error" };
 
+const eyebrow = "text-[11px] font-medium uppercase tracking-[0.14em] text-quiet";
+const labelCls = "flex flex-col gap-2";
+const inputCls =
+  "w-full rounded-full border border-line bg-surface px-3.5 py-2 text-sm text-ink transition-colors hover:border-line-strong";
+const secondaryBtn =
+  "rounded-full border border-line-strong bg-surface px-5 py-2.5 text-[13px] font-medium tracking-[0.02em] text-ink transition-colors hover:bg-sunken";
+
 export function Player() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -303,46 +310,53 @@ export function Player() {
   if (phase === "reciting") {
     body = (
       <div className="flex flex-col items-center justify-center gap-3 text-center">
-        <p className="text-lg font-medium text-zinc-800 dark:text-zinc-100">
+        <p className={eyebrow}>Your turn</p>
+        <p className="font-display text-2xl leading-snug text-ink">
           {state.mode === "test"
             ? `Recite ${state.surah}:${displayAyah} from memory`
-            : `Your turn: ${state.surah}:${displayAyah}`}
+            : `Repeat ${state.surah}:${displayAyah} aloud`}
         </p>
-        <p className="text-3xl font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
-          {remaining.toFixed(1)}s
+        <p className="text-4xl font-medium tabular-nums tracking-tight text-forest">
+          {remaining.toFixed(1)}
+          <span className="ml-0.5 text-lg text-muted">s</span>
         </p>
         {state.mode === "repeat" && (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Repeat the verse aloud while it is paused.
+          <p className="text-sm text-muted">
+            The verse is paused — say it while you have it.
           </p>
         )}
       </div>
     );
   } else if (!verseEntry || verseEntry.status === "loading") {
-    body = <p className="text-center text-zinc-500">Loading verse…</p>;
+    body = <p className="text-center text-sm text-muted">Loading verse…</p>;
   } else if (verseEntry.status === "error") {
     body = (
-      <p className="text-center text-red-500">Could not load verse text.</p>
+      <p className="text-center text-sm text-danger">
+        Could not load verse text.
+      </p>
     );
   } else {
     const verse = verseEntry.data;
     body = (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         {!hideText && (
           <p
             dir="rtl"
             lang="ar"
-            className="text-right font-arabic text-3xl leading-[2.25] text-zinc-900 dark:text-zinc-50"
+            className="font-arabic text-right text-[1.7rem] leading-[2.35] text-ink"
           >
             {verse.arabic}
           </p>
         )}
         {hideText ? (
-          <p className="text-center text-zinc-500 dark:text-zinc-400">
-            Hidden while you recite
-          </p>
+          <div className="flex flex-col items-center gap-2 py-4 text-center">
+            <p className={eyebrow}>Hidden</p>
+            <p className="text-sm text-muted">
+              Reciting from memory — the text stays covered.
+            </p>
+          </div>
         ) : (
-          <p className="text-base leading-relaxed font-english text-zinc-700 dark:text-zinc-300">
+          <p className="font-english text-base leading-relaxed text-muted">
             {verse.english}
           </p>
         )}
@@ -350,7 +364,7 @@ export function Player() {
           href={quranComUrl(state.surah, displayAyah)}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-medium text-emerald-600 hover:underline dark:text-emerald-400"
+          className="text-[13px] font-medium tracking-[0.02em] text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:text-forest hover:decoration-forest"
         >
           Open on Quran.com →
         </a>
@@ -371,18 +385,22 @@ export function Player() {
         }
       />
 
-      <div className="flex flex-1 flex-col items-center bg-zinc-50 px-4 py-10 font-sans dark:bg-black">
-        <main className="flex w-full max-w-2xl flex-col gap-8">
-          <header className="text-center">
-            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-              Subciska
+      <div className="flex flex-1 flex-col items-center bg-canvas px-4 pb-16 pt-10 font-sans">
+        <main className="flex w-full max-w-3xl flex-col gap-10">
+          <header className="max-w-xl">
+            <p className={eyebrow}>Quran memorization</p>
+            <h1 className="mt-3 font-display text-[2.5rem] leading-[1.1] tracking-tight text-ink sm:text-[3rem]">
+              Hear an ayah.
+              <br />
+              Pause. Recall.
             </h1>
-            <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-              Hear an ayah, pause to recall the next, then continue.
+            <p className="mt-4 max-w-md text-base leading-relaxed text-muted">
+              Listen, then recite the next from memory. A calm loop for
+              building verse-by-verse recall.
             </p>
           </header>
 
-          <div className="flex w-full max-w-2xl flex-col gap-6">
+          <div className="flex w-full flex-col gap-6">
             <audio
               ref={audioRef}
               onEnded={onAudioEnded}
@@ -390,14 +408,19 @@ export function Player() {
               className="hidden"
             />
 
-            <section className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-1.5 text-sm">
-                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
-                    Surah
-                  </span>
+            <section className="rounded-2xl border border-line bg-surface p-6">
+              <div className="mb-5 flex items-center justify-between border-b border-line pb-3">
+                <p className={eyebrow}>Session</p>
+                <p className="text-[11px] uppercase tracking-[0.12em] text-quiet">
+                  {surah.name}
+                </p>
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className={labelCls}>
+                  <span className={eyebrow}>Surah</span>
                   <select
-                    className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+                    className={inputCls}
                     value={state.surah}
                     onChange={(e) => {
                       const id = Number(e.target.value);
@@ -421,34 +444,54 @@ export function Player() {
                   </select>
                 </label>
 
-                <label className="flex flex-col gap-1.5 text-sm">
-                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
-                    Mode
-                  </span>
-                  <select
-                    className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
-                    value={state.mode}
-                    onChange={(e) => {
-                      stopAll();
-                      const mode = e.target.value as Mode;
-                      setStateAndPersist((prev) => ({ ...prev, mode }));
-                      applyStep(0);
-                    }}
+                <div className={labelCls}>
+                  <span className={eyebrow}>Mode</span>
+                  <div
+                    className="flex rounded-full border border-line bg-sunken p-1"
+                    role="group"
+                    aria-label="Mode"
                   >
-                    <option value="test">Test me (recall)</option>
-                    <option value="repeat">Repeat (learn)</option>
-                  </select>
-                </label>
+                    {(
+                      [
+                        { value: "test", label: "Test me" },
+                        { value: "repeat", label: "Repeat" },
+                      ] as const
+                    ).map((option) => {
+                      const active = state.mode === option.value;
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() => {
+                            if (state.mode === option.value) return;
+                            stopAll();
+                            setStateAndPersist((prev) => ({
+                              ...prev,
+                              mode: option.value as Mode,
+                            }));
+                            applyStep(0);
+                          }}
+                          className={`flex-1 rounded-full px-3 py-2 text-[13px] font-medium tracking-[0.02em] transition-colors ${
+                            active
+                              ? "bg-ink text-on-action"
+                              : "text-muted hover:text-ink"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
-                <label className="flex flex-col gap-1.5 text-sm">
-                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
-                    From ayah
-                  </span>
+                <label className={labelCls}>
+                  <span className={eyebrow}>From ayah</span>
                   <input
                     type="number"
                     min={1}
                     max={surah.ayahs}
-                    className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+                    className={inputCls}
                     value={state.startAyah}
                     onChange={(e) => {
                       const start = Math.max(
@@ -471,15 +514,13 @@ export function Player() {
                   />
                 </label>
 
-                <label className="flex flex-col gap-1.5 text-sm">
-                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
-                    To ayah
-                  </span>
+                <label className={labelCls}>
+                  <span className={eyebrow}>To ayah</span>
                   <input
                     type="number"
                     min={state.startAyah}
                     max={surah.ayahs}
-                    className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+                    className={inputCls}
                     value={state.endAyah}
                     onChange={(e) => {
                       const end = Math.max(
@@ -504,14 +545,13 @@ export function Player() {
                   />
                 </label>
 
-                <label className="flex flex-col gap-1.5 text-sm">
-                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
-                    Mute first (ayat)
-                  </span>
+                <label className={labelCls}>
+                  <span className={eyebrow}>Mute first (ayat)</span>
                   <input
                     type="number"
                     min={0}
                     max={Math.max(0, state.endAyah - state.startAyah + 1)}
+                    className={inputCls}
                     value={leadMutes}
                     onChange={(e) => {
                       const next = clampLeadMutes(
@@ -526,10 +566,10 @@ export function Player() {
                   />
                 </label>
 
-                <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
-                  <span className="flex items-center justify-between font-medium text-zinc-600 dark:text-zinc-400">
-                    Pause length
-                    <span className="tabular-nums text-zinc-900 dark:text-zinc-100">
+                <label className={`${labelCls} sm:col-span-2`}>
+                  <span className="flex items-center justify-between">
+                    <span className={eyebrow}>Pause length</span>
+                    <span className="text-sm tabular-nums text-ink">
                       {state.pauseSeconds.toFixed(1)}s
                     </span>
                   </span>
@@ -543,65 +583,60 @@ export function Player() {
                       const pauseSeconds = Number(e.target.value);
                       setStateAndPersist((prev) => ({ ...prev, pauseSeconds }));
                     }}
+                    className="w-full"
                   />
                 </label>
               </div>
             </section>
 
-            <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-              <div className="mb-4 flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400">
-                <span>
-                  {surah.name} · {state.surah}:{displayAyah}
-                </span>
-                <span>
+            <section className="rounded-2xl border border-line bg-surface p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-sm font-medium text-ink">
+                  {surah.name}
+                  <span className="text-muted">
+                    {" "}
+                    · {state.surah}:{displayAyah}
+                  </span>
+                </p>
+                <p className="text-[11px] uppercase tracking-[0.12em] text-quiet tabular-nums">
                   Step {Math.min(step + 1, steps.length)} / {steps.length}
-                </span>
+                </p>
               </div>
 
-              <div className="mb-6 h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+              <div className="mb-6 h-1 overflow-hidden rounded-full bg-sand">
                 <div
-                  className="h-full rounded-full bg-emerald-500 transition-all"
+                  className="h-full rounded-full bg-forest transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
 
-              <div className="min-h-[10rem] rounded-xl bg-zinc-50 p-5 dark:bg-zinc-900">
+              <div className="min-h-[11rem] rounded-xl bg-sunken px-5 py-6">
                 {body}
               </div>
 
               {audioError && (
-                <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                <p className="mt-4 rounded-xl border border-line bg-clay/15 px-3.5 py-2.5 text-sm text-ink">
                   {audioError}
                 </p>
               )}
 
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={goPrev}
-                  className="rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
-                  aria-label="Previous step"
-                >
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+                <button type="button" onClick={goPrev} className={secondaryBtn} aria-label="Previous step">
                   ← Back
                 </button>
                 <button
                   type="button"
                   onClick={togglePlay}
-                  className="rounded-full bg-emerald-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500"
+                  className="rounded-full bg-action px-9 py-3 text-[13px] font-medium uppercase tracking-[0.1em] text-on-action transition-colors hover:opacity-90"
                 >
                   {phase === "idle" ? "Play" : "Stop"}
                 </button>
-                <button
-                  type="button"
-                  onClick={goNext}
-                  className="rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
-                  aria-label="Next step"
-                >
+                <button type="button" onClick={goNext} className={secondaryBtn} aria-label="Next step">
                   Forward →
                 </button>
               </div>
 
-              <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
+              <p className="mt-5 text-center text-xs leading-relaxed text-quiet">
                 {leadMutes > 0
                   ? `First ${leadMutes} ayat muted (recite from memory), then ${
                       state.mode === "test"
@@ -615,8 +650,10 @@ export function Player() {
             </section>
           </div>
 
-          <footer className="text-center text-xs text-zinc-400 dark:text-zinc-600">
-            Your last position is saved automatically.
+          <footer className="border-t border-line pt-6 text-center">
+            <p className="text-[11px] uppercase tracking-[0.14em] text-quiet">
+              Your last position is saved automatically
+            </p>
           </footer>
         </main>
       </div>

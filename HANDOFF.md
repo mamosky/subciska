@@ -104,6 +104,27 @@ Files go in R2 bucket **`subciska-audio`** at key `{surah}_{ayah}.mp3` (e.g. `1_
 - Persisted in localStorage + D1 columns `user_state.arabic_font`, `user_state.english_font` (migration `0003_font_settings.sql`). **Apply migrations with `--command`, not `--file`** — multi-statement file import can hit OAuth `Authentication error [code: 10000]` on this machine.
 - Invalid values coerced with `coerceArabicFont` / `coerceEnglishFont`.
 
+### Design system — Allbirds-inspired (live)
+
+Visual language is modeled on allbirds.com: warm oatmeal canvas, quiet chrome, editorial serif for display only, pill CTAs.
+
+| Role | Light | Notes |
+|---|---|---|
+| Canvas | `#ece9e2` | page bg — never pure white |
+| Surface | `#ffffff` | header, cards |
+| Sand / sunken | `#e0dacf` / `#f4f2ec` | progress track, verse well |
+| Ink / muted / quiet | `#212121` / `#575757` / `#767676` | text hierarchy |
+| Line / line-strong | `#d6d2c8` / `#b9b4a7` | hairline borders |
+| Action / on-action | `#212121` / `#ffffff` | primary pill CTA |
+| Forest | `#3a6b52` | progress, countdown, focus, link hover |
+
+- Tokens live as CSS vars in `globals.css` (`:root` + warm dark override) and are exposed via `@theme inline` as Tailwind utilities: `bg-canvas`, `bg-surface`, `bg-sand`, `bg-sunken`, `text-ink`, `text-muted`, `text-quiet`, `border-line`, `bg-action`, `text-on-action`, `bg-forest`, `text-forest`, `font-display`. Prefer these over raw `zinc`/`emerald`.
+- **Typography:** Instrument Serif (`font-display`, `--font-display-serif` in `layout.tsx`) for hero + wordmark only — sparing, like Allbirds' Self Modern. Geist (`font-sans`) as the Geograph stand-in for UI; uppercase tracked eyebrows (`11px` / `0.14em`) for labels.
+- **Shapes:** full pill (`rounded-full`) on buttons, inputs, segmented control; `rounded-2xl` (16px) on cards; hairline borders; soft shadow only on the settings popover.
+- **Controls:** Mode is a **segmented pill** (Test me / Repeat) — selected = ink fill, unselected = muted. Primary Play = solid ink pill, uppercase tracked. Secondary = outline pill.
+- Dark mode still works via `prefers-color-scheme` flipping the same CSS vars (warm charcoal, not pure black).
+- `themeColor` must be exported from `viewport`, not `metadata` (Next 16 warning).
+
 ### Lint gotcha
 
 `eslint-config-next` rule **`react-hooks/set-state-in-effect`** forbids synchronous `setState` in effect bodies. Don't "fix" by moving setState into the effect body.
@@ -118,6 +139,7 @@ Working in production:
 - Arabic font fully live (200 on woff2/ttf, preload in HTML, KFGQPC in CSS)
 - Lead-mute option live ("Mute first (ayat)")
 - App Settings live (menubar gear → Arabic/English font pickers)
+- Allbirds-style redesign live (oatmeal canvas, serif hero, pill CTAs, forest accent)
 - `lint` / `tsc --noEmit` / `next build` / `opennextjs-cloudflare build` all pass
 
 Not done:

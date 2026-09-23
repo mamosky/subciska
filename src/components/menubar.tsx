@@ -26,13 +26,18 @@ function GearIcon() {
       strokeWidth="1.75"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-5 w-5"
+      className="h-4 w-4"
     >
       <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
       <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
+
+const eyebrow =
+  "text-[11px] font-medium uppercase tracking-[0.14em] text-quiet";
+const fieldSelect =
+  "w-full rounded-full border border-line bg-surface px-3.5 py-2 text-sm text-ink transition-colors hover:border-line-strong";
 
 export function Menubar({
   arabicFont,
@@ -63,48 +68,49 @@ export function Menubar({
   }, [open]);
 
   return (
-    <div
-      ref={rootRef}
-      className="sticky top-0 z-50 border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90"
-    >
-      <div className="mx-auto flex w-full max-w-2xl items-center justify-between px-4 py-3">
+    <header className="sticky top-0 z-50 border-b border-line bg-surface/95 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-3.5">
         <Link
           href="/"
-          className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
+          className="group flex items-baseline gap-2"
         >
-          Subciska
+          <span className="font-display text-[1.35rem] leading-none tracking-tight text-ink">
+            Subciska
+          </span>
+          <span className="hidden text-[10px] font-medium uppercase tracking-[0.16em] text-quiet sm:inline">
+            Memorize
+          </span>
         </Link>
 
         <div className="relative">
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
-            className={`rounded-lg border p-2 transition-colors ${
+            className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-[11px] font-medium uppercase tracking-[0.12em] transition-colors ${
               open
-                ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-                : "border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                ? "border-ink bg-ink text-on-action"
+                : "border-line bg-surface text-ink hover:border-line-strong hover:bg-sunken"
             }`}
             aria-label="App Settings"
             aria-expanded={open}
             aria-haspopup="dialog"
           >
             <GearIcon />
+            <span className="hidden sm:inline">Settings</span>
           </button>
 
           {open && (
             <div
               role="dialog"
               aria-label="App Settings"
-              className="absolute right-0 mt-2 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-zinc-200 bg-white p-4 shadow-xl dark:border-zinc-800 dark:bg-zinc-950"
+              className="absolute right-0 mt-2.5 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-line bg-surface p-5 shadow-[0_12px_40px_rgba(33,33,33,0.08)]"
             >
-              <div className="mb-3 flex items-center justify-between">
-                <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-                  App Settings
-                </p>
+              <div className="mb-4 flex items-center justify-between border-b border-line pb-3">
+                <p className={eyebrow}>App Settings</p>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded-md px-2 py-1 text-sm text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                  className="-mr-1 rounded-full px-2 py-1 text-sm text-muted hover:bg-sunken hover:text-ink"
                   aria-label="Close settings"
                 >
                   ✕
@@ -112,12 +118,10 @@ export function Menubar({
               </div>
 
               <div className="flex flex-col gap-4">
-                <label className="flex flex-col gap-1.5 text-sm">
-                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
-                    Arabic font
-                  </span>
+                <label className="flex flex-col gap-2 text-sm">
+                  <span className={eyebrow}>Arabic font</span>
                   <select
-                    className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+                    className={fieldSelect}
                     value={arabicFont}
                     onChange={(event) =>
                       onArabicFontChange(event.target.value as ArabicFont)
@@ -132,18 +136,16 @@ export function Menubar({
                   <span
                     dir="rtl"
                     lang="ar"
-                    className="font-arabic rounded-lg bg-zinc-50 px-3 py-2 text-right text-lg text-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+                    className="font-arabic rounded-xl bg-sunken px-3.5 py-2.5 text-right text-lg text-ink"
                   >
                     بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                   </span>
                 </label>
 
-                <label className="flex flex-col gap-1.5 text-sm">
-                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
-                    English font
-                  </span>
+                <label className="flex flex-col gap-2 text-sm">
+                  <span className={eyebrow}>English font</span>
                   <select
-                    className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+                    className={fieldSelect}
                     value={englishFont}
                     onChange={(event) =>
                       onEnglishFontChange(event.target.value as EnglishFont)
@@ -155,7 +157,7 @@ export function Menubar({
                       </option>
                     ))}
                   </select>
-                  <span className="font-english rounded-lg bg-zinc-50 px-3 py-2 text-base text-zinc-800 dark:bg-zinc-900 dark:text-zinc-100">
+                  <span className="font-english rounded-xl bg-sunken px-3.5 py-2.5 text-base text-ink">
                     In the name of God, the Most Gracious, the Most Merciful.
                   </span>
                 </label>
@@ -164,6 +166,6 @@ export function Menubar({
           )}
         </div>
       </div>
-    </div>
+    </header>
   );
 }

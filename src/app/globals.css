@@ -1,8 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ece9e2;
+  --surface: #ffffff;
+  --surface-muted: #e0dacf;
+  --surface-sunken: #f4f2ec;
+  --ink: #212121;
+  --ink-muted: #575757;
+  --ink-quiet: #767676;
+  --line: #d6d2c8;
+  --line-strong: #b9b4a7;
+  --action: #212121;
+  --on-action: #ffffff;
+  --forest: #3a6b52;
+  --forest-hover: #2f5743;
+  --forest-tint: #dfe8e1;
+  --clay: #c08457;
+  --danger: #a3402f;
   --font-arabic-user: "KFGQPC Hafs Uthmanic Script", "UthmanicHafs",
     "Geeza Pro", "Arabic Typesetting", "Noto Naskh Arabic", serif;
   --font-english-user: var(--font-geist-sans), Arial, Helvetica, sans-serif;
@@ -18,23 +32,69 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-canvas: var(--background);
+  --color-surface: var(--surface);
+  --color-sand: var(--surface-muted);
+  --color-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-muted: var(--ink-muted);
+  --color-quiet: var(--ink-quiet);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-action: var(--action);
+  --color-on-action: var(--on-action);
+  --color-forest: var(--forest);
+  --color-forest-hover: var(--forest-hover);
+  --color-forest-tint: var(--forest-tint);
+  --color-clay: var(--clay);
+  --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display-serif), Georgia, "Times New Roman",
+    serif;
   --font-arabic: var(--font-arabic-user);
   --font-english: var(--font-english-user);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1a1916;
+    --surface: #24221e;
+    --surface-muted: #2e2b26;
+    --surface-sunken: #14130f;
+    --ink: #f2efe8;
+    --ink-muted: #b5b0a6;
+    --ink-quiet: #8f8a80;
+    --line: #3a372f;
+    --line-strong: #4c483f;
+    --action: #f2efe8;
+    --on-action: #1a1916;
+    --forest: #7fb397;
+    --forest-hover: #9cc7ae;
+    --forest-tint: #24352b;
+    --clay: #d4a57e;
+    --danger: #e08573;
   }
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Warm, quiet focus + range accents (Allbirds-style natural green) */
+:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 2px;
+}
+
+input[type="range"] {
+  accent-color: var(--forest);
+}
+
+select,
+input[type="number"] {
+  color-scheme: light dark;
 }
