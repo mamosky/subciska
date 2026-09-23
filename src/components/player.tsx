@@ -15,6 +15,7 @@ import {
 } from "@/lib/player";
 import { fetchVerseText } from "@/lib/quran-api";
 import { applyFontSettings } from "@/lib/fonts";
+import { applyTheme } from "@/lib/themes";
 import { Menubar } from "@/components/menubar";
 import {
   fetchRemoteState,
@@ -312,6 +313,10 @@ export function Player() {
   ]);
 
   useEffect(() => {
+    applyTheme(state.theme);
+  }, [state.theme]);
+
+  useEffect(() => {
     if (!hydrated) return;
     const entry = verses[verseKey];
     if (entry && entry.status !== "loading") return;
@@ -473,6 +478,7 @@ export function Player() {
         englishFont={state.englishFont}
         arabicTextSize={state.arabicTextSize}
         englishTextSize={state.englishTextSize}
+        theme={state.theme}
         onArabicFontChange={(arabicFont) =>
           setStateAndPersist((prev) => ({ ...prev, arabicFont }))
         }
@@ -484,6 +490,9 @@ export function Player() {
         }
         onEnglishTextSizeChange={(englishTextSize) =>
           setStateAndPersist((prev) => ({ ...prev, englishTextSize }))
+        }
+        onThemeChange={(theme) =>
+          setStateAndPersist((prev) => ({ ...prev, theme }))
         }
       />
 

@@ -57,15 +57,17 @@ src/
     api/state/route.ts    # GET/PUT user state (D1, prepare-only — see below)
     api/audio/[surah]/[ayah]/route.ts  # streams MP3 from R2 AUDIO_BUCKET
   components/player.tsx   # main UI: Test/Repeat modes, range, pause slider, progress; renders Menubar
-  components/menubar.tsx   # sticky top bar + gear icon; App Settings dropdown (fonts + text sizes)
+  components/menubar.tsx   # sticky top bar + gear icon; App Settings (theme grid, fonts, text sizes)
   lib/player.ts           # DEFAULT_STATE, SavedState type
   lib/fonts.ts            # Arabic/English font + text-size options; applyFontSettings CSS vars
+  lib/themes.ts           # 20 theme defs, coerceTheme, applyTheme (data-theme on html)
 public/fonts/             # hafs-uthmanic-v14-full.woff2 (.ttf), self-hosted
 scripts/populate-cache.mjs
 migrations/0001_init.sql  # user_state schema (already applied remotely)
 migrations/0002_lead_mutes.sql  # ADD COLUMN lead_mutes INTEGER NOT NULL DEFAULT 0 (applied remotely)
 migrations/0003_font_settings.sql  # ADD COLUMN arabic_font / english_font (applied remotely via --command, not --file)
 migrations/0004_text_sizes.sql  # ADD COLUMN arabic_text_size / english_text_size (applied remotely)
+migrations/0005_theme.sql  # ADD COLUMN theme TEXT NOT NULL DEFAULT 'auto' (applied remotely)
 wrangler.jsonc            # bindings (DB, R2, ASSETS, WORKER_SELF_REFERENCE)
 open-next.config.ts
 subciska spec doc.rtf     # original requirements
@@ -94,16 +96,18 @@ Files go in R2 bucket **`subciska-audio`** at key `{surah}_{ayah}.mp3` (e.g. `1_
 - Persisted in localStorage + D1 column `user_state.lead_mutes` (migration `0002_lead_mutes.sql`, applied via `CI=true npx wrangler d1 execute subciska --remote --file=...` — not via route `db.exec`).
 - Clamped with `clampLeadMutes()` whenever range/mode changes; `buildSteps(start, end, mode, leadMutes)`.
 
-### App Settings — fonts (`arabicFont` / `englishFont`)
+### App Settings — fonts, text sizes, themes
 
-- **Menubar** (`src/components/menubar.tsx`): sticky top bar with app name + **gear icon**. Gear opens an **App Settings** popover (close on ✕ / outside click / Escape).
+- **Menubar** (`src/components/menubar.tsx`): sticky top bar with app name + **gear icon**. Gear opens an **App Settings** popover (close on ✕ / outside click / Escape; scrollable, sticky header).
+- **Theme picker** (`src/lib/themes.ts`): 20 options — System (auto) + 12 light + 7 dark. Applied via `data-theme` on `<html>`; CSS palettes live in `globals.css` as `[data-theme="…"]` blocks. `auto` removes the attribute so `prefers-color-scheme` dark still applies (`:root:not([data-theme])`).
 - Font pickers + live previews live **only in that popover** (not in the player body).
 - Arabic options (`src/lib/fonts.ts`): `hafs` (default, self-hosted KFGQPC), `system`, `naskh`.
 - English options: `geist` (default), `mono`, `system`, `serif`, `arial`.
+- Text sizes: `sm` / `md` (default) / `lg` / `xl` → CSS vars `--font-arabic-size` / `--font-english-size`.
 - Applied by setting CSS vars `--font-arabic-user` / `--font-english-user` on `<html>`; Tailwind `font-arabic` / `font-english` read those vars (`globals.css` `@theme inline`).
-- Player owns `SavedState` and passes `arabicFont`/`englishFont` + change callbacks into `Menubar`.
-- Persisted in localStorage + D1 columns `user_state.arabic_font`, `user_state.english_font` (migration `0003_font_settings.sql`). **Apply migrations with `--command`, not `--file`** — multi-statement file import can hit OAuth `Authentication error [code: 10000]` on this machine.
-- Invalid values coerced with `coerceArabicFont` / `coerceEnglishFont`.
+- Player owns `SavedState` and passes props + change callbacks into `Menubar`.
+- Persisted in localStorage + D1 columns `user_state.arabic_font`, `user_state.english_font`, `user_state.arabic_text_size`, `user_state.english_text_size`, `user_state.theme` (migrations `0003`–`0005`). **Apply migrations with `--command`, not `--file`** — multi-statement file import can hit OAuth `Authentication error [code: 10000]` on this machine. Transient Cloudflare API `7403` can also flake — just retry.
+- Invalid values coerced with `coerceArabicFont` / `coerceEnglishFont` / `coerceArabicTextSize` / `coerceEnglishTextSize` / `coerceTheme`.
 
 ### Design system — warm modern (live)
 
@@ -143,7 +147,7 @@ Working in production:
 - `/api/state` GET + PUT round-trip persists to D1 (includes `leadMutes`, `arabicFont`, `englishFont`)
 - Arabic font fully live (200 on woff2/ttf, preload in HTML, KFGQPC in CSS)
 - Lead-mute option live ("Mute first (ayat)")
-- App Settings live (menubar gear → Arabic/English font + text size pickers)
+- App Settings live (menubar gear → theme grid + Arabic/English font + text size pickers)
 - Warm modern redesign live (frosted header, circular transport, countdown ring, sliding mode pill)
 - `lint` / `tsc --noEmit` / `next build` / `opennextjs-cloudflare build` all pass
 

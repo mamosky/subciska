@@ -7,6 +7,7 @@ import {
   DEFAULT_ENGLISH_FONT,
   DEFAULT_ENGLISH_SIZE,
 } from "./fonts";
+import { DEFAULT_THEME, type ThemeId } from "./themes";
 
 export type SavedState = {
   surah: number;
@@ -20,6 +21,7 @@ export type SavedState = {
   englishFont: EnglishFont;
   arabicTextSize: TextSize;
   englishTextSize: TextSize;
+  theme: ThemeId;
   step: number;
 };
 
@@ -43,6 +45,7 @@ export const DEFAULT_STATE: SavedState = {
   englishFont: DEFAULT_ENGLISH_FONT,
   arabicTextSize: DEFAULT_ARABIC_SIZE,
   englishTextSize: DEFAULT_ENGLISH_SIZE,
+  theme: DEFAULT_THEME,
   step: 0,
 };
 

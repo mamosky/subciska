@@ -6,6 +6,7 @@ import {
   coerceEnglishFont,
   coerceEnglishTextSize,
 } from "./fonts";
+import { coerceTheme } from "./themes";
 
 const KEY = "subciska:state";
 
@@ -29,6 +30,7 @@ export function loadLocalState(): SavedState | null {
       englishFont: coerceEnglishFont(parsed.englishFont),
       arabicTextSize: coerceArabicTextSize(parsed.arabicTextSize),
       englishTextSize: coerceEnglishTextSize(parsed.englishTextSize),
+      theme: coerceTheme(parsed.theme),
       step: Number(parsed.step) || 0,
       mode: parsed.mode === "repeat" ? "repeat" : "test",
     };

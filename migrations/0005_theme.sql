@@ -1,0 +1,1 @@
+ALTER TABLE user_state ADD COLUMN theme TEXT NOT NULL DEFAULT 'auto';

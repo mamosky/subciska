@@ -10,6 +10,7 @@ import {
   coerceEnglishFont,
   coerceEnglishTextSize,
 } from "@/lib/fonts";
+import { coerceTheme } from "@/lib/themes";
 
 const ROW_ID = "default";
 
@@ -24,6 +25,7 @@ type Row = {
   english_font: string | null;
   arabic_text_size: string | null;
   english_text_size: string | null;
+  theme: string | null;
   step: number;
 };
 
@@ -41,6 +43,7 @@ function rowToState(row: Row): SavedState {
     englishFont: coerceEnglishFont(row.english_font),
     arabicTextSize: coerceArabicTextSize(row.arabic_text_size),
     englishTextSize: coerceEnglishTextSize(row.english_text_size),
+    theme: coerceTheme(row.theme),
     step: row.step,
   };
 }
@@ -50,7 +53,7 @@ export async function GET() {
     const { env } = getCloudflareContext();
     const row = await env.DB.prepare(
       `SELECT surah, start_ayah, end_ayah, mode, pause_seconds, lead_mutes,
-              arabic_font, english_font, arabic_text_size, english_text_size, step
+              arabic_font, english_font, arabic_text_size, english_text_size, theme, step
        FROM user_state WHERE id = ?`
     )
       .bind(ROW_ID)
@@ -83,6 +86,7 @@ export async function PUT(request: Request) {
       englishFont: coerceEnglishFont(body.englishFont),
       arabicTextSize: coerceArabicTextSize(body.arabicTextSize),
       englishTextSize: coerceEnglishTextSize(body.englishTextSize),
+      theme: coerceTheme(body.theme),
       step: Number.isFinite(Number(body.step)) ? Number(body.step) : 0,
     };
 
@@ -90,9 +94,9 @@ export async function PUT(request: Request) {
     await env.DB.prepare(
       `INSERT INTO user_state (
          id, surah, start_ayah, end_ayah, mode, pause_seconds, lead_mutes,
-         arabic_font, english_font, arabic_text_size, english_text_size, step, updated_at
+         arabic_font, english_font, arabic_text_size, english_text_size, theme, step, updated_at
        )
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
        ON CONFLICT(id) DO UPDATE SET
          surah = excluded.surah,
          start_ayah = excluded.start_ayah,
@@ -104,6 +108,7 @@ export async function PUT(request: Request) {
          english_font = excluded.english_font,
          arabic_text_size = excluded.arabic_text_size,
          english_text_size = excluded.english_text_size,
+         theme = excluded.theme,
          step = excluded.step,
          updated_at = datetime('now')`
     )
@@ -119,6 +124,7 @@ export async function PUT(request: Request) {
         state.englishFont,
         state.arabicTextSize,
         state.englishTextSize,
+        state.theme,
         state.step
       )
       .run();

@@ -10,16 +10,19 @@ import {
   type EnglishFont,
   type TextSize,
 } from "@/lib/fonts";
+import { THEME_OPTIONS, type ThemeId } from "@/lib/themes";
 
 type MenubarProps = {
   arabicFont: ArabicFont;
   englishFont: EnglishFont;
   arabicTextSize: TextSize;
   englishTextSize: TextSize;
+  theme: ThemeId;
   onArabicFontChange: (font: ArabicFont) => void;
   onEnglishFontChange: (font: EnglishFont) => void;
   onArabicTextSizeChange: (size: TextSize) => void;
   onEnglishTextSizeChange: (size: TextSize) => void;
+  onThemeChange: (theme: ThemeId) => void;
 };
 
 function GearIcon() {
@@ -61,10 +64,12 @@ export function Menubar({
   englishFont,
   arabicTextSize,
   englishTextSize,
+  theme,
   onArabicFontChange,
   onEnglishFontChange,
   onArabicTextSizeChange,
   onEnglishTextSizeChange,
+  onThemeChange,
 }: MenubarProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -124,9 +129,9 @@ export function Menubar({
             <div
               role="dialog"
               aria-label="App Settings"
-              className="animate-pop absolute right-0 mt-3 w-[min(22rem,calc(100vw-2rem))] rounded-3xl border border-line/80 bg-surface p-5 shadow-lg"
+              className="animate-pop absolute right-0 mt-3 max-h-[min(85vh,40rem)] w-[min(24rem,calc(100vw-2rem))] overflow-y-auto rounded-3xl border border-line/80 bg-surface p-5 shadow-lg"
             >
-              <div className="mb-4 flex items-center justify-between border-b border-line/70 pb-3">
+              <div className="sticky top-0 z-10 -mx-5 -mt-5 mb-4 flex items-center justify-between border-b border-line/70 bg-surface/95 px-5 pb-3 pt-5 backdrop-blur">
                 <p className={eyebrow}>App Settings</p>
                 <button
                   type="button"
@@ -138,7 +143,60 @@ export function Menubar({
                 </button>
               </div>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-2.5">
+                  <span className={eyebrow}>Theme</span>
+                  <div
+                    className="grid grid-cols-4 gap-2"
+                    role="listbox"
+                    aria-label="Theme"
+                  >
+                    {THEME_OPTIONS.map((option) => {
+                      const active = theme === option.id;
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          role="option"
+                          aria-selected={active}
+                          onClick={() => onThemeChange(option.id)}
+                          title={option.label}
+                          className={`group flex flex-col items-center gap-1.5 rounded-xl p-1.5 transition-all active:scale-95 ${
+                            active
+                              ? "bg-forest-tint ring-2 ring-forest"
+                              : "hover:bg-sunken"
+                          }`}
+                        >
+                          <span
+                            className="relative flex h-10 w-full items-center justify-center overflow-hidden rounded-lg border border-line/60"
+                            style={{ backgroundColor: option.canvas }}
+                          >
+                            <span
+                              className="absolute left-1 top-1 h-3.5 w-5 rounded-[3px] border border-black/5"
+                              style={{ backgroundColor: option.surface }}
+                            />
+                            <span
+                              className="absolute bottom-1.5 right-1.5 h-2.5 w-2.5 rounded-full"
+                              style={{ backgroundColor: option.accent }}
+                            />
+                            <span
+                              className="absolute bottom-1.5 left-1.5 h-1 w-6 rounded-full"
+                              style={{ backgroundColor: option.ink, opacity: 0.35 }}
+                            />
+                          </span>
+                          <span
+                            className={`w-full truncate text-center text-[9px] font-medium leading-tight ${
+                              active ? "text-forest" : "text-quiet"
+                            }`}
+                          >
+                            {option.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <label className="flex flex-col gap-2 text-sm">
                   <span className={eyebrow}>Arabic font</span>
                   <select
