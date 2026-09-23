@@ -3,6 +3,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-arabic-user: "KFGQPC Hafs Uthmanic Script", "UthmanicHafs",
+    "Geeza Pro", "Arabic Typesetting", "Noto Naskh Arabic", serif;
+  --font-english-user: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
 @font-face {
@@ -19,8 +22,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-arabic: "KFGQPC Hafs Uthmanic Script", "UthmanicHafs", "Geeza Pro",
-    "Arabic Typesetting", "Noto Naskh Arabic", serif;
+  --font-arabic: var(--font-arabic-user);
+  --font-english: var(--font-english-user);
 }
 
 @media (prefers-color-scheme: dark) {

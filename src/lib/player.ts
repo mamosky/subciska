@@ -1,5 +1,8 @@
 export type Mode = "test" | "repeat";
 
+import type { ArabicFont, EnglishFont } from "./fonts";
+import { DEFAULT_ARABIC_FONT, DEFAULT_ENGLISH_FONT } from "./fonts";
+
 export type SavedState = {
   surah: number;
   startAyah: number;
@@ -8,6 +11,8 @@ export type SavedState = {
   pauseSeconds: number;
   /** Number of ayat at the start of the range to mute (no audio) before playback begins. */
   leadMutes: number;
+  arabicFont: ArabicFont;
+  englishFont: EnglishFont;
   step: number;
 };
 
@@ -27,6 +32,8 @@ export const DEFAULT_STATE: SavedState = {
   mode: "test",
   pauseSeconds: 5,
   leadMutes: 0,
+  arabicFont: DEFAULT_ARABIC_FONT,
+  englishFont: DEFAULT_ENGLISH_FONT,
   step: 0,
 };
 

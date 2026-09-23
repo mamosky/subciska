@@ -4,6 +4,7 @@ import {
   clampLeadMutes,
   type SavedState,
 } from "@/lib/player";
+import { coerceArabicFont, coerceEnglishFont } from "@/lib/fonts";
 
 const ROW_ID = "default";
 
@@ -14,6 +15,8 @@ type Row = {
   mode: string;
   pause_seconds: number;
   lead_mutes: number;
+  arabic_font: string | null;
+  english_font: string | null;
   step: number;
 };
 
@@ -27,6 +30,8 @@ function rowToState(row: Row): SavedState {
     mode: row.mode === "repeat" ? "repeat" : "test",
     pauseSeconds: row.pause_seconds,
     leadMutes: clampLeadMutes(row.lead_mutes ?? 0, startAyah, endAyah),
+    arabicFont: coerceArabicFont(row.arabic_font),
+    englishFont: coerceEnglishFont(row.english_font),
     step: row.step,
   };
 }
@@ -35,7 +40,9 @@ export async function GET() {
   try {
     const { env } = getCloudflareContext();
     const row = await env.DB.prepare(
-      "SELECT surah, start_ayah, end_ayah, mode, pause_seconds, lead_mutes, step FROM user_state WHERE id = ?"
+      `SELECT surah, start_ayah, end_ayah, mode, pause_seconds, lead_mutes,
+              arabic_font, english_font, step
+       FROM user_state WHERE id = ?`
     )
       .bind(ROW_ID)
       .first<Row>();
@@ -63,13 +70,18 @@ export async function PUT(request: Request) {
         startAyah,
         endAyah
       ),
+      arabicFont: coerceArabicFont(body.arabicFont),
+      englishFont: coerceEnglishFont(body.englishFont),
       step: Number.isFinite(Number(body.step)) ? Number(body.step) : 0,
     };
 
     const { env } = getCloudflareContext();
     await env.DB.prepare(
-      `INSERT INTO user_state (id, surah, start_ayah, end_ayah, mode, pause_seconds, lead_mutes, step, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+      `INSERT INTO user_state (
+         id, surah, start_ayah, end_ayah, mode, pause_seconds, lead_mutes,
+         arabic_font, english_font, step, updated_at
+       )
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
        ON CONFLICT(id) DO UPDATE SET
          surah = excluded.surah,
          start_ayah = excluded.start_ayah,
@@ -77,6 +89,8 @@ export async function PUT(request: Request) {
          mode = excluded.mode,
          pause_seconds = excluded.pause_seconds,
          lead_mutes = excluded.lead_mutes,
+         arabic_font = excluded.arabic_font,
+         english_font = excluded.english_font,
          step = excluded.step,
          updated_at = datetime('now')`
     )
@@ -88,6 +102,8 @@ export async function PUT(request: Request) {
         state.mode,
         state.pauseSeconds,
         state.leadMutes,
+        state.arabicFont,
+        state.englishFont,
         state.step
       )
       .run();

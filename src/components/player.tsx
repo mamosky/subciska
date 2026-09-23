@@ -14,6 +14,8 @@ import {
   type VerseText,
 } from "@/lib/player";
 import { fetchVerseText } from "@/lib/quran-api";
+import { applyFontSettings } from "@/lib/fonts";
+import { Menubar } from "@/components/menubar";
 import {
   fetchRemoteState,
   loadLocalState,
@@ -259,6 +261,10 @@ export function Player() {
   }, []);
 
   useEffect(() => {
+    applyFontSettings(state.arabicFont, state.englishFont);
+  }, [state.arabicFont, state.englishFont]);
+
+  useEffect(() => {
     if (!hydrated) return;
     const entry = verses[verseKey];
     if (entry && entry.status !== "loading") return;
@@ -336,7 +342,7 @@ export function Player() {
             Hidden while you recite
           </p>
         ) : (
-          <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
+          <p className="text-base leading-relaxed font-english text-zinc-700 dark:text-zinc-300">
             {verse.english}
           </p>
         )}
@@ -353,233 +359,267 @@ export function Player() {
   }
 
   return (
-    <div className="flex w-full max-w-2xl flex-col gap-6">
-      <audio
-        ref={audioRef}
-        onEnded={onAudioEnded}
-        preload="none"
-        className="hidden"
+    <>
+      <Menubar
+        arabicFont={state.arabicFont}
+        englishFont={state.englishFont}
+        onArabicFontChange={(arabicFont) =>
+          setStateAndPersist((prev) => ({ ...prev, arabicFont }))
+        }
+        onEnglishFontChange={(englishFont) =>
+          setStateAndPersist((prev) => ({ ...prev, englishFont }))
+        }
       />
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-zinc-600 dark:text-zinc-400">
-              Surah
-            </span>
-            <select
-              className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
-              value={state.surah}
-              onChange={(e) => {
-                const id = Number(e.target.value);
-                const s = getSurah(id);
-                stopAll();
-                setStateAndPersist((prev) => ({
-                  ...prev,
-                  surah: id,
-                  startAyah: 1,
-                  endAyah: Math.min(prev.endAyah || s.ayahs, s.ayahs),
-                  step: 0,
-                }));
-                applyStep(0);
-              }}
-            >
-              {SURAHS.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.id}. {s.name} ({s.ayahs})
-                </option>
-              ))}
-            </select>
-          </label>
+      <div className="flex flex-1 flex-col items-center bg-zinc-50 px-4 py-10 font-sans dark:bg-black">
+        <main className="flex w-full max-w-2xl flex-col gap-8">
+          <header className="text-center">
+            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+              Subciska
+            </h1>
+            <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+              Hear an ayah, pause to recall the next, then continue.
+            </p>
+          </header>
 
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-zinc-600 dark:text-zinc-400">
-              Mode
-            </span>
-            <select
-              className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
-              value={state.mode}
-              onChange={(e) => {
-                stopAll();
-                const mode = e.target.value as Mode;
-                setStateAndPersist((prev) => ({ ...prev, mode }));
-                applyStep(0);
-              }}
-            >
-              <option value="test">Test me (recall)</option>
-              <option value="repeat">Repeat (learn)</option>
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-zinc-600 dark:text-zinc-400">
-              From ayah
-            </span>
-            <input
-              type="number"
-              min={1}
-              max={surah.ayahs}
-              className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
-              value={state.startAyah}
-              onChange={(e) => {
-                const start = Math.max(
-                  1,
-                  Math.min(Number(e.target.value) || 1, surah.ayahs)
-                );
-                stopAll();
-                setStateAndPersist((prev) => ({
-                  ...prev,
-                  startAyah: start,
-                  endAyah: Math.max(prev.endAyah, start),
-                  leadMutes: clampLeadMutes(
-                    prev.leadMutes,
-                    start,
-                    Math.max(prev.endAyah, start)
-                  ),
-                }));
-                applyStep(0);
-              }}
+          <div className="flex w-full max-w-2xl flex-col gap-6">
+            <audio
+              ref={audioRef}
+              onEnded={onAudioEnded}
+              preload="none"
+              className="hidden"
             />
-          </label>
 
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-zinc-600 dark:text-zinc-400">
-              To ayah
-            </span>
-            <input
-              type="number"
-              min={state.startAyah}
-              max={surah.ayahs}
-              className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
-              value={state.endAyah}
-              onChange={(e) => {
-                const end = Math.max(
-                  state.startAyah,
-                  Math.min(
-                    Number(e.target.value) || state.startAyah,
-                    surah.ayahs
-                  )
-                );
-                stopAll();
-                setStateAndPersist((prev) => ({
-                  ...prev,
-                  endAyah: end,
-                  leadMutes: clampLeadMutes(prev.leadMutes, prev.startAyah, end),
-                }));
-                applyStep(0);
-              }}
-            />
-          </label>
+            <section className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-1.5 text-sm">
+                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
+                    Surah
+                  </span>
+                  <select
+                    className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+                    value={state.surah}
+                    onChange={(e) => {
+                      const id = Number(e.target.value);
+                      const s = getSurah(id);
+                      stopAll();
+                      setStateAndPersist((prev) => ({
+                        ...prev,
+                        surah: id,
+                        startAyah: 1,
+                        endAyah: Math.min(prev.endAyah || s.ayahs, s.ayahs),
+                        step: 0,
+                      }));
+                      applyStep(0);
+                    }}
+                  >
+                    {SURAHS.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.id}. {s.name} ({s.ayahs})
+                      </option>
+                    ))}
+                  </select>
+                </label>
 
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-zinc-600 dark:text-zinc-400">
-              Mute first (ayat)
-            </span>
-            <input
-              type="number"
-              min={0}
-              max={Math.max(0, state.endAyah - state.startAyah + 1)}
-              value={leadMutes}
-              onChange={(e) => {
-                const next = clampLeadMutes(
-                  Number(e.target.value) || 0,
-                  state.startAyah,
-                  state.endAyah
-                );
-                stopAll();
-                setStateAndPersist((prev) => ({ ...prev, leadMutes: next }));
-                applyStep(0);
-              }}
-            />
-          </label>
+                <label className="flex flex-col gap-1.5 text-sm">
+                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
+                    Mode
+                  </span>
+                  <select
+                    className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+                    value={state.mode}
+                    onChange={(e) => {
+                      stopAll();
+                      const mode = e.target.value as Mode;
+                      setStateAndPersist((prev) => ({ ...prev, mode }));
+                      applyStep(0);
+                    }}
+                  >
+                    <option value="test">Test me (recall)</option>
+                    <option value="repeat">Repeat (learn)</option>
+                  </select>
+                </label>
 
-          <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
-            <span className="flex items-center justify-between font-medium text-zinc-600 dark:text-zinc-400">
-              Pause length
-              <span className="tabular-nums text-zinc-900 dark:text-zinc-100">
-                {state.pauseSeconds.toFixed(1)}s
-              </span>
-            </span>
-            <input
-              type="range"
-              min={1}
-              max={20}
-              step={0.5}
-              value={state.pauseSeconds}
-              onChange={(e) => {
-                const pauseSeconds = Number(e.target.value);
-                setStateAndPersist((prev) => ({ ...prev, pauseSeconds }));
-              }}
-            />
-          </label>
-        </div>
-      </section>
+                <label className="flex flex-col gap-1.5 text-sm">
+                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
+                    From ayah
+                  </span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={surah.ayahs}
+                    className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+                    value={state.startAyah}
+                    onChange={(e) => {
+                      const start = Math.max(
+                        1,
+                        Math.min(Number(e.target.value) || 1, surah.ayahs)
+                      );
+                      stopAll();
+                      setStateAndPersist((prev) => ({
+                        ...prev,
+                        startAyah: start,
+                        endAyah: Math.max(prev.endAyah, start),
+                        leadMutes: clampLeadMutes(
+                          prev.leadMutes,
+                          start,
+                          Math.max(prev.endAyah, start)
+                        ),
+                      }));
+                      applyStep(0);
+                    }}
+                  />
+                </label>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mb-4 flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400">
-          <span>
-            {surah.name} · {state.surah}:{displayAyah}
-          </span>
-          <span>
-            Step {Math.min(step + 1, steps.length)} / {steps.length}
-          </span>
-        </div>
+                <label className="flex flex-col gap-1.5 text-sm">
+                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
+                    To ayah
+                  </span>
+                  <input
+                    type="number"
+                    min={state.startAyah}
+                    max={surah.ayahs}
+                    className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+                    value={state.endAyah}
+                    onChange={(e) => {
+                      const end = Math.max(
+                        state.startAyah,
+                        Math.min(
+                          Number(e.target.value) || state.startAyah,
+                          surah.ayahs
+                        )
+                      );
+                      stopAll();
+                      setStateAndPersist((prev) => ({
+                        ...prev,
+                        endAyah: end,
+                        leadMutes: clampLeadMutes(
+                          prev.leadMutes,
+                          prev.startAyah,
+                          end
+                        ),
+                      }));
+                      applyStep(0);
+                    }}
+                  />
+                </label>
 
-        <div className="mb-6 h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-          <div
-            className="h-full rounded-full bg-emerald-500 transition-all"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+                <label className="flex flex-col gap-1.5 text-sm">
+                  <span className="font-medium text-zinc-600 dark:text-zinc-400">
+                    Mute first (ayat)
+                  </span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={Math.max(0, state.endAyah - state.startAyah + 1)}
+                    value={leadMutes}
+                    onChange={(e) => {
+                      const next = clampLeadMutes(
+                        Number(e.target.value) || 0,
+                        state.startAyah,
+                        state.endAyah
+                      );
+                      stopAll();
+                      setStateAndPersist((prev) => ({ ...prev, leadMutes: next }));
+                      applyStep(0);
+                    }}
+                  />
+                </label>
 
-        <div className="min-h-[10rem] rounded-xl bg-zinc-50 p-5 dark:bg-zinc-900">
-          {body}
-        </div>
+                <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
+                  <span className="flex items-center justify-between font-medium text-zinc-600 dark:text-zinc-400">
+                    Pause length
+                    <span className="tabular-nums text-zinc-900 dark:text-zinc-100">
+                      {state.pauseSeconds.toFixed(1)}s
+                    </span>
+                  </span>
+                  <input
+                    type="range"
+                    min={1}
+                    max={20}
+                    step={0.5}
+                    value={state.pauseSeconds}
+                    onChange={(e) => {
+                      const pauseSeconds = Number(e.target.value);
+                      setStateAndPersist((prev) => ({ ...prev, pauseSeconds }));
+                    }}
+                  />
+                </label>
+              </div>
+            </section>
 
-        {audioError && (
-          <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
-            {audioError}
-          </p>
-        )}
+            <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+              <div className="mb-4 flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400">
+                <span>
+                  {surah.name} · {state.surah}:{displayAyah}
+                </span>
+                <span>
+                  Step {Math.min(step + 1, steps.length)} / {steps.length}
+                </span>
+              </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={goPrev}
-            className="rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
-            aria-label="Previous step"
-          >
-            ← Back
-          </button>
-          <button
-            type="button"
-            onClick={togglePlay}
-            className="rounded-full bg-emerald-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500"
-          >
-            {phase === "idle" ? "Play" : "Stop"}
-          </button>
-          <button
-            type="button"
-            onClick={goNext}
-            className="rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
-            aria-label="Next step"
-          >
-            Forward →
-          </button>
-        </div>
+              <div className="mb-6 h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                <div
+                  className="h-full rounded-full bg-emerald-500 transition-all"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
 
-        <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
-          {leadMutes > 0
-            ? `First ${leadMutes} ayat muted (recite from memory), then ${
-                state.mode === "test"
-                  ? "even steps play · odd steps pause"
-                  : "each ayah plays, then pauses"
-              }`
-            : state.mode === "test"
-              ? "Even steps play audio · Odd steps pause so you recite the next ayah"
-              : "Each ayah plays, then pauses so you repeat it aloud · Range loops"}
-        </p>
-      </section>
-    </div>
+              <div className="min-h-[10rem] rounded-xl bg-zinc-50 p-5 dark:bg-zinc-900">
+                {body}
+              </div>
+
+              {audioError && (
+                <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                  {audioError}
+                </p>
+              )}
+
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  className="rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+                  aria-label="Previous step"
+                >
+                  ← Back
+                </button>
+                <button
+                  type="button"
+                  onClick={togglePlay}
+                  className="rounded-full bg-emerald-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500"
+                >
+                  {phase === "idle" ? "Play" : "Stop"}
+                </button>
+                <button
+                  type="button"
+                  onClick={goNext}
+                  className="rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+                  aria-label="Next step"
+                >
+                  Forward →
+                </button>
+              </div>
+
+              <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
+                {leadMutes > 0
+                  ? `First ${leadMutes} ayat muted (recite from memory), then ${
+                      state.mode === "test"
+                        ? "even steps play · odd steps pause"
+                        : "each ayah plays, then pauses"
+                    }`
+                  : state.mode === "test"
+                    ? "Even steps play audio · Odd steps pause so you recite the next ayah"
+                    : "Each ayah plays, then pauses so you repeat it aloud · Range loops"}
+              </p>
+            </section>
+          </div>
+
+          <footer className="text-center text-xs text-zinc-400 dark:text-zinc-600">
+            Your last position is saved automatically.
+          </footer>
+        </main>
+      </div>
+    </>
   );
 }

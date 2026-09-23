@@ -56,12 +56,15 @@ src/
     globals.css           # @font-face for KFGQPC Hafs Uthmanic Script; --font-arabic
     api/state/route.ts    # GET/PUT user state (D1, prepare-only — see below)
     api/audio/[surah]/[ayah]/route.ts  # streams MP3 from R2 AUDIO_BUCKET
-  components/player.tsx   # main UI: Test/Repeat modes, range, pause slider, progress
+  components/player.tsx   # main UI: Test/Repeat modes, range, pause slider, progress; renders Menubar
+  components/menubar.tsx   # sticky top bar + gear icon; App Settings dropdown (fonts)
   lib/player.ts           # DEFAULT_STATE, SavedState type
+  lib/fonts.ts            # Arabic/English font options + applyFontSettings CSS vars
 public/fonts/             # hafs-uthmanic-v14-full.woff2 (.ttf), self-hosted
 scripts/populate-cache.mjs
 migrations/0001_init.sql  # user_state schema (already applied remotely)
 migrations/0002_lead_mutes.sql  # ADD COLUMN lead_mutes INTEGER NOT NULL DEFAULT 0 (applied remotely)
+migrations/0003_font_settings.sql  # ADD COLUMN arabic_font / english_font (applied remotely via --command, not --file)
 wrangler.jsonc            # bindings (DB, R2, ASSETS, WORKER_SELF_REFERENCE)
 open-next.config.ts
 subciska spec doc.rtf     # original requirements
@@ -90,6 +93,17 @@ Files go in R2 bucket **`subciska-audio`** at key `{surah}_{ayah}.mp3` (e.g. `1_
 - Persisted in localStorage + D1 column `user_state.lead_mutes` (migration `0002_lead_mutes.sql`, applied via `CI=true npx wrangler d1 execute subciska --remote --file=...` — not via route `db.exec`).
 - Clamped with `clampLeadMutes()` whenever range/mode changes; `buildSteps(start, end, mode, leadMutes)`.
 
+### App Settings — fonts (`arabicFont` / `englishFont`)
+
+- **Menubar** (`src/components/menubar.tsx`): sticky top bar with app name + **gear icon**. Gear opens an **App Settings** popover (close on ✕ / outside click / Escape).
+- Font pickers + live previews live **only in that popover** (not in the player body).
+- Arabic options (`src/lib/fonts.ts`): `hafs` (default, self-hosted KFGQPC), `system`, `naskh`.
+- English options: `geist` (default), `mono`, `system`, `serif`, `arial`.
+- Applied by setting CSS vars `--font-arabic-user` / `--font-english-user` on `<html>`; Tailwind `font-arabic` / `font-english` read those vars (`globals.css` `@theme inline`).
+- Player owns `SavedState` and passes `arabicFont`/`englishFont` + change callbacks into `Menubar`.
+- Persisted in localStorage + D1 columns `user_state.arabic_font`, `user_state.english_font` (migration `0003_font_settings.sql`). **Apply migrations with `--command`, not `--file`** — multi-statement file import can hit OAuth `Authentication error [code: 10000]` on this machine.
+- Invalid values coerced with `coerceArabicFont` / `coerceEnglishFont`.
+
 ### Lint gotcha
 
 `eslint-config-next` rule **`react-hooks/set-state-in-effect`** forbids synchronous `setState` in effect bodies. Don't "fix" by moving setState into the effect body.
@@ -100,9 +114,10 @@ ESLint ignores: `.open-next/**`, `.wrangler/**`, `worker-configuration.d.ts` (se
 
 Working in production:
 - Home page 200, BUILD_ID matches local `.open-next/assets/BUILD_ID`
-- `/api/state` GET + PUT round-trip persists to D1 (includes `leadMutes` / `lead_mutes`)
+- `/api/state` GET + PUT round-trip persists to D1 (includes `leadMutes`, `arabicFont`, `englishFont`)
 - Arabic font fully live (200 on woff2/ttf, preload in HTML, KFGQPC in CSS)
 - Lead-mute option live ("Mute first (ayat)")
+- App Settings live (menubar gear → Arabic/English font pickers)
 - `lint` / `tsc --noEmit` / `next build` / `opennextjs-cloudflare build` all pass
 
 Not done:
