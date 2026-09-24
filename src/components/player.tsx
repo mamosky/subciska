@@ -528,7 +528,10 @@ export function Player() {
                         ...prev,
                         surah: id,
                         startAyah: 1,
-                        endAyah: Math.min(prev.endAyah || s.ayahs, s.ayahs),
+                        endAyah: Math.min(
+                          Math.max(prev.endAyah || 1, 1),
+                          s.ayahs
+                        ),
                         step: 0,
                       }));
                       applyStep(0);
@@ -588,11 +591,8 @@ export function Player() {
                 </div>
 
                 <label className={labelCls}>
-                  <span className={eyebrow}>From ayah</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={surah.ayahs}
+                  <span className={eyebrow}>Ayat from</span>
+                  <select
                     className={inputCls}
                     value={state.startAyah}
                     onChange={(e) => {
@@ -613,15 +613,18 @@ export function Player() {
                       }));
                       applyStep(0);
                     }}
-                  />
+                  >
+                    {Array.from({ length: surah.ayahs }, (_, i) => i + 1).map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
                 </label>
 
                 <label className={labelCls}>
-                  <span className={eyebrow}>To ayah</span>
-                  <input
-                    type="number"
-                    min={state.startAyah}
-                    max={surah.ayahs}
+                  <span className={eyebrow}>Ayat to</span>
+                  <select
                     className={inputCls}
                     value={state.endAyah}
                     onChange={(e) => {
@@ -644,7 +647,13 @@ export function Player() {
                       }));
                       applyStep(0);
                     }}
-                  />
+                  >
+                    {Array.from({ length: surah.ayahs }, (_, i) => i + 1).map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
                 </label>
 
                 <label className={labelCls}>
