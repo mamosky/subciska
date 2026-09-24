@@ -60,7 +60,7 @@ src/
   components/menubar.tsx   # sticky top bar + gear icon; App Settings (theme grid, fonts, text sizes)
   lib/player.ts           # DEFAULT_STATE, SavedState type
   lib/fonts.ts            # Arabic/English font + text-size options; applyFontSettings CSS vars
-  lib/themes.ts           # 20 theme defs, coerceTheme, applyTheme (data-theme on html)
+  lib/themes.ts           # 30 theme defs (light/mid/dark), coerceTheme, applyTheme (data-theme on html)
 public/fonts/             # hafs-uthmanic-v14-full.woff2 (.ttf), self-hosted
 scripts/populate-cache.mjs
 migrations/0001_init.sql  # user_state schema (already applied remotely)
@@ -99,7 +99,7 @@ Files go in R2 bucket **`subciska-audio`** at key `{surah}_{ayah}.mp3` (e.g. `1_
 ### App Settings — fonts, text sizes, themes
 
 - **Menubar** (`src/components/menubar.tsx`): sticky top bar with app name + **gear icon**. Gear opens an **App Settings** popover (close on ✕ / outside click / Escape; scrollable, sticky header).
-- **Theme picker** (`src/lib/themes.ts`): 20 options — System (auto) + 12 light + 7 dark. Applied via `data-theme` on `<html>`; CSS palettes live in `globals.css` as `[data-theme="…"]` blocks. `auto` removes the attribute so `prefers-color-scheme` dark still applies (`:root:not([data-theme])`).
+- **Theme picker** (`src/lib/themes.ts`): 30 options grouped Default / Light / Mid / Dark — System + 12 light + 10 mid (between light and dark: Fog, Sandstone, Dusk, Taupe, Slate, Moss, Mauve, Denim, Clay, Olive) + 7 dark. Applied via `data-theme` on `<html>`; CSS palettes live in `globals.css` as `[data-theme="…"]` blocks. `auto` removes the attribute so `prefers-color-scheme` dark still applies (`:root:not([data-theme])`). Mid themes use `color-scheme: dark` (or light for Fog/Sandstone) so form controls match.
 - Font pickers + live previews live **only in that popover** (not in the player body).
 - Arabic options (`src/lib/fonts.ts`): `hafs` (default, self-hosted KFGQPC), `system`, `naskh`.
 - English options: `geist` (default), `mono`, `system`, `serif`, `arial`.

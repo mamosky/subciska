@@ -10,7 +10,7 @@ import {
   type EnglishFont,
   type TextSize,
 } from "@/lib/fonts";
-import { THEME_OPTIONS, type ThemeId } from "@/lib/themes";
+import { themeGroups, type ThemeId } from "@/lib/themes";
 
 type MenubarProps = {
   arabicFont: ArabicFont;
@@ -144,56 +144,68 @@ export function Menubar({
               </div>
 
               <div className="flex flex-col gap-5">
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-3">
                   <span className={eyebrow}>Theme</span>
                   <div
-                    className="grid grid-cols-4 gap-2"
+                    className="flex flex-col gap-3"
                     role="listbox"
                     aria-label="Theme"
                   >
-                    {THEME_OPTIONS.map((option) => {
-                      const active = theme === option.id;
-                      return (
-                        <button
-                          key={option.id}
-                          type="button"
-                          role="option"
-                          aria-selected={active}
-                          onClick={() => onThemeChange(option.id)}
-                          title={option.label}
-                          className={`group flex flex-col items-center gap-1.5 rounded-xl p-1.5 transition-all active:scale-95 ${
-                            active
-                              ? "bg-forest-tint ring-2 ring-forest"
-                              : "hover:bg-sunken"
-                          }`}
-                        >
-                          <span
-                            className="relative flex h-10 w-full items-center justify-center overflow-hidden rounded-lg border border-line/60"
-                            style={{ backgroundColor: option.canvas }}
-                          >
-                            <span
-                              className="absolute left-1 top-1 h-3.5 w-5 rounded-[3px] border border-black/5"
-                              style={{ backgroundColor: option.surface }}
-                            />
-                            <span
-                              className="absolute bottom-1.5 right-1.5 h-2.5 w-2.5 rounded-full"
-                              style={{ backgroundColor: option.accent }}
-                            />
-                            <span
-                              className="absolute bottom-1.5 left-1.5 h-1 w-6 rounded-full"
-                              style={{ backgroundColor: option.ink, opacity: 0.35 }}
-                            />
-                          </span>
-                          <span
-                            className={`w-full truncate text-center text-[9px] font-medium leading-tight ${
-                              active ? "text-forest" : "text-quiet"
-                            }`}
-                          >
-                            {option.label}
-                          </span>
-                        </button>
-                      );
-                    })}
+                    {themeGroups().map((group) => (
+                      <div key={group.label} className="flex flex-col gap-1.5">
+                        <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-quiet/80">
+                          {group.label}
+                        </p>
+                        <div className="grid grid-cols-4 gap-2">
+                          {group.themes.map((option) => {
+                            const active = theme === option.id;
+                            return (
+                              <button
+                                key={option.id}
+                                type="button"
+                                role="option"
+                                aria-selected={active}
+                                onClick={() => onThemeChange(option.id)}
+                                title={option.label}
+                                className={`group flex flex-col items-center gap-1.5 rounded-xl p-1.5 transition-all active:scale-95 ${
+                                  active
+                                    ? "bg-forest-tint ring-2 ring-forest"
+                                    : "hover:bg-sunken"
+                                }`}
+                              >
+                                <span
+                                  className="relative flex h-10 w-full items-center justify-center overflow-hidden rounded-lg border border-line/60"
+                                  style={{ backgroundColor: option.canvas }}
+                                >
+                                  <span
+                                    className="absolute left-1 top-1 h-3.5 w-5 rounded-[3px] border border-black/5"
+                                    style={{ backgroundColor: option.surface }}
+                                  />
+                                  <span
+                                    className="absolute bottom-1.5 right-1.5 h-2.5 w-2.5 rounded-full"
+                                    style={{ backgroundColor: option.accent }}
+                                  />
+                                  <span
+                                    className="absolute bottom-1.5 left-1.5 h-1 w-6 rounded-full"
+                                    style={{
+                                      backgroundColor: option.ink,
+                                      opacity: 0.35,
+                                    }}
+                                  />
+                                </span>
+                                <span
+                                  className={`w-full truncate text-center text-[9px] font-medium leading-tight ${
+                                    active ? "text-forest" : "text-quiet"
+                                  }`}
+                                >
+                                  {option.label}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 

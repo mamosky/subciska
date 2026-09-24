@@ -12,6 +12,16 @@ export type ThemeId =
   | "sky"
   | "lavender"
   | "arctic"
+  | "fog"
+  | "sandstone"
+  | "dusk"
+  | "taupe"
+  | "slate"
+  | "moss"
+  | "mauve"
+  | "denim"
+  | "clay"
+  | "olive"
   | "midnight"
   | "charcoal"
   | "espresso"
@@ -20,10 +30,12 @@ export type ThemeId =
   | "plum"
   | "ember";
 
+export type ThemeMode = "auto" | "light" | "mid" | "dark";
+
 export type ThemeMeta = {
   id: ThemeId;
   label: string;
-  mode: "auto" | "light" | "dark";
+  mode: ThemeMode;
   /** Colors for the swatch preview in App Settings */
   canvas: string;
   surface: string;
@@ -166,6 +178,106 @@ export const THEME_OPTIONS: ThemeMeta[] = [
     themeColor: "#eef2f5",
   },
   {
+    id: "fog",
+    label: "Fog",
+    mode: "mid",
+    canvas: "#9aa0a6",
+    surface: "#a8aeb4",
+    accent: "#3d6a8a",
+    ink: "#1a1e22",
+    themeColor: "#9aa0a6",
+  },
+  {
+    id: "sandstone",
+    label: "Sandstone",
+    mode: "mid",
+    canvas: "#b7a68c",
+    surface: "#c4b49a",
+    accent: "#6b4a28",
+    ink: "#2a2218",
+    themeColor: "#b7a68c",
+  },
+  {
+    id: "dusk",
+    label: "Dusk",
+    mode: "mid",
+    canvas: "#3f3a48",
+    surface: "#4a4555",
+    accent: "#c4a0e0",
+    ink: "#ebe6f2",
+    themeColor: "#3f3a48",
+  },
+  {
+    id: "taupe",
+    label: "Taupe",
+    mode: "mid",
+    canvas: "#6a6258",
+    surface: "#786f64",
+    accent: "#e0c8a0",
+    ink: "#f4efe6",
+    themeColor: "#6a6258",
+  },
+  {
+    id: "slate",
+    label: "Slate",
+    mode: "mid",
+    canvas: "#4a5562",
+    surface: "#556170",
+    accent: "#8ebcd8",
+    ink: "#e8eef4",
+    themeColor: "#4a5562",
+  },
+  {
+    id: "moss",
+    label: "Moss",
+    mode: "mid",
+    canvas: "#4a5848",
+    surface: "#556454",
+    accent: "#a8c890",
+    ink: "#e8f0e4",
+    themeColor: "#4a5848",
+  },
+  {
+    id: "mauve",
+    label: "Mauve",
+    mode: "mid",
+    canvas: "#5a4e58",
+    surface: "#665a64",
+    accent: "#d4a0c0",
+    ink: "#f0e8ee",
+    themeColor: "#5a4e58",
+  },
+  {
+    id: "denim",
+    label: "Denim",
+    mode: "mid",
+    canvas: "#3e4a5c",
+    surface: "#4a5668",
+    accent: "#90b8e0",
+    ink: "#e4ecf6",
+    themeColor: "#3e4a5c",
+  },
+  {
+    id: "clay",
+    label: "Clay",
+    mode: "mid",
+    canvas: "#6a5048",
+    surface: "#785c54",
+    accent: "#e0a888",
+    ink: "#f4ece6",
+    themeColor: "#6a5048",
+  },
+  {
+    id: "olive",
+    label: "Olive",
+    mode: "mid",
+    canvas: "#4a4e38",
+    surface: "#565a42",
+    accent: "#c8d080",
+    ink: "#eef0e0",
+    themeColor: "#4a4e38",
+  },
+  {
     id: "midnight",
     label: "Midnight",
     mode: "dark",
@@ -249,6 +361,27 @@ export function getTheme(id: ThemeId): ThemeMeta {
   return THEME_OPTIONS.find((o) => o.id === id) ?? THEME_OPTIONS[0];
 }
 
+/** Group themes for the App Settings picker (auto first, then light / mid / dark). */
+export function themeGroups(): { label: string; themes: ThemeMeta[] }[] {
+  const auto = THEME_OPTIONS.filter((t) => t.mode === "auto");
+  const light = THEME_OPTIONS.filter((t) => t.mode === "light");
+  const mid = THEME_OPTIONS.filter((t) => t.mode === "mid");
+  const dark = THEME_OPTIONS.filter((t) => t.mode === "dark");
+  return [
+    { label: "Default", themes: auto },
+    { label: "Light", themes: light },
+    { label: "Mid", themes: mid },
+    { label: "Dark", themes: dark },
+  ].filter((g) => g.themes.length > 0);
+}
+
+/** Mid themes need dark form controls but are not full dark — pick color-scheme from mode. */
+function colorSchemeFor(mode: ThemeMode): "light" | "dark" | "" {
+  if (mode === "light" || mode === "auto") return "light";
+  if (mode === "mid" || mode === "dark") return "dark";
+  return "";
+}
+
 /** Apply theme via `data-theme` on <html>; "auto" clears it so system dark mode applies. */
 export function applyTheme(id: ThemeId): void {
   if (typeof document === "undefined") return;
@@ -259,7 +392,7 @@ export function applyTheme(id: ThemeId): void {
     root.style.colorScheme = "";
   } else {
     root.setAttribute("data-theme", id);
-    root.style.colorScheme = meta.mode;
+    root.style.colorScheme = colorSchemeFor(meta.mode);
   }
   const themeColor = document.querySelector('meta[name="theme-color"]');
   if (themeColor) themeColor.setAttribute("content", meta.themeColor);
