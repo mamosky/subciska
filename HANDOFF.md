@@ -1,6 +1,6 @@
 # Subciska — Agent Handoff
 
-> Last updated: 2026-09-23. Read this before touching the project.
+> Last updated: 2026-09-23. Read this before touching the project. Repo is fully pushed to `origin/main` for LLM handover.
 
 ## What this is
 
@@ -144,11 +144,13 @@ ESLint ignores: `.open-next/**`, `.wrangler/**`, `worker-configuration.d.ts` (se
 
 Working in production:
 - Home page 200, BUILD_ID matches local `.open-next/assets/BUILD_ID`
-- `/api/state` GET + PUT round-trip persists to D1 (includes `leadMutes`, `arabicFont`, `englishFont`)
+- `/api/state` GET + PUT round-trip persists to D1 (includes `leadMutes`, fonts, text sizes, `theme`)
 - Arabic font fully live (200 on woff2/ttf, preload in HTML, KFGQPC in CSS)
 - Lead-mute option live ("Mute first (ayat)")
-- App Settings live (menubar gear → theme grid + Arabic/English font + text size pickers)
+- **Ayat from / Ayat to are dropdowns** listing 1…last for the selected surah
+- App Settings live (menubar gear → grouped theme grid + Arabic/English font + text size pickers)
 - Warm modern redesign live (frosted header, circular transport, countdown ring, sliding mode pill)
+- 30 themes (System / 12 light / 10 mid / 7 dark) live in CSS + picker
 - `lint` / `tsc --noEmit` / `next build` / `opennextjs-cloudflare build` all pass
 
 Not done:
